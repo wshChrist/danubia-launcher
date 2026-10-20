@@ -1,0 +1,22 @@
+# Compilation du plugin BakkesMod « Danubia » sous Windows (MSVC), à poser dans .github/workflows/ d'un dépôt
+# qui contient danubia-rl/plugin/. Le .dll sort en artefact « danubiarl » : à copier dans launcher/rl/danubiarl.dll.
+name: plugin-rl
+on:
+  workflow_dispatch:
+  push:
+    paths: ["danubia-rl/plugin/**"]
+jobs:
+  windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: SDK BakkesMod
+        run: git clone --depth 1 https://github.com/bakkesmodorg/BakkesModSDK.git sdk
+      - name: Compilation
+        run: |
+          cmake -S danubia-rl/plugin -B build -A x64 -DBAKKESMOD_SDK="${{ github.workspace }}/sdk"
+          cmake --build build --config Release
+      - uses: actions/upload-artifact@v4
+        with:
+          name: danubiarl
+          path: build/Release/danubiarl.dll
